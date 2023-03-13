@@ -2,6 +2,7 @@ from scipy.spatial import distance
 from imutils import face_utils
 import imutils
 import dlib
+import os
 import cv2
 
 
@@ -14,15 +15,11 @@ def eye_aspect_ratio(eye):
 
 #Threshold value which suggests closed eyes	
 thresh = 0.27 
-#Checking for some n frames
 frame_check = 20
-#Detect face
-detect = dlib.get_frontal_face_detector()
-# Dat file is the crux of the code
-predict = dlib.shape_predictor(
-	"/Users/printedshelf/Desktop/Attentiveness/Predicting-Student-Attentiveness-using-OpenCV/data/shape_predictor_68_face_landmarks.dat")
 
-#Getting the start and end points for both eyes
+detect = dlib.get_frontal_face_detector()
+predict = dlib.shape_predictor(os.getcwd() +"/data/shape_predictor_68_face_landmarks.dat")
+
 (lStart, lEnd) = face_utils.FACIAL_LANDMARKS_68_IDXS["left_eye"]
 (rStart, rEnd) = face_utils.FACIAL_LANDMARKS_68_IDXS["right_eye"]
 
@@ -39,9 +36,7 @@ while True:
 	txt='Not Attentive'
 	for subject in subjects:
 		structure = predict(gray, subject)
-		#converting to NumPy Array 
 		structure = face_utils.shape_to_np(structure)
-		#Draw rectangle for face detection
 		if subjects != []:
 			for subject in subjects:
 				x = subject.left()
@@ -57,7 +52,6 @@ while True:
 		leftEAR = eye_aspect_ratio(leftEye)
 		rightEAR = eye_aspect_ratio(rightEye)
 		ear = (leftEAR + rightEAR) / 2.0
-		#Bordering eyes
 		leftEyeHull = cv2.convexHull(leftEye)
 		rightEyeHull = cv2.convexHull(rightEye)
 		# cv2.drawContours(img, [leftEyeHull], -1, (0, 255, 0), 1)
@@ -67,7 +61,6 @@ while True:
 			if flag >= frame_check:
 				cv2.putText(img, "********DROWSINESS DETECTED!**********", (10, 30),
 					cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-				# print ("Drowsy")
 				txt='Not Attentive'
 		else:
 			flag = 0
@@ -76,7 +69,6 @@ while True:
 	cv2.putText(img, txt, (10, 325),
         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
 	cv2.imshow("Frame",img)
-	#ESC key to exit
 	key = cv2.waitKey(10) & 0xFF
 	if key == 27:
 		break
