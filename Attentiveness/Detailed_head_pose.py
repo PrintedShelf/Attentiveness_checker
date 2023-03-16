@@ -56,7 +56,6 @@ while(True):
                 ])
 
         size = frame.shape
-
         focal_length = size[1]
         center = (size[1] // 2, size[0] // 2) 
 
